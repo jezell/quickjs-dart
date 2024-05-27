@@ -30,7 +30,7 @@ manager.dispose();
 ## notify callback
 
 If you want to receive data directly from js code, you need register a notify callback in Dart side:
-```
+```dart
 const code = """
 let scope = {
   send(obj) {
@@ -43,7 +43,7 @@ engine.eval(code); // receive message but do nothing.
 engine.registerBridge('_sendMsg', (obj) {
   final val = obj['key']; // $variable_in_dart
 });
-engine.eval(code); // receive message call dart callback.
+engine.eval(code); // receive message and call the callback in dart world.
 ```
 remember to use the builtin `_ffiNotify` in js world.
 
