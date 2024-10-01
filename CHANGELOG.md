@@ -1,3 +1,8 @@
+## 1.0.1
+
+- Upgrade native_assets_cli 0.8.0
+- Upgrade ffi 2.1.3
+
 ## 1.0.0
 
 - Add build script and sources.
