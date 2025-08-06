@@ -1,0 +1,122 @@
+name: Building - Build (Multi-arch)
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'quickjs-v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, macos, windows]
+        arch: [x64, arm64]
+        include:
+          - os: linux
+            arch: x64
+            runner: ubuntu-latest
+          - os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+
+          - os: windows
+            arch: x64
+            runner: windows-latest
+          - os: windows
+            arch: arm64
+            runner: windows-latest
+
+          - os: macos
+            arch: x64
+            runner: macos-13
+        exclude:
+          - os: macos
+            arch: arm64
+#           runner: macos-13-xlarge
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: dart-lang/setup-dart@v1
+      with:
+        sdk: 3.10.0-14.0.dev
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.arch == 'arm64' && 'amd64_arm64' || 'amd64_x86' }}
+      if: ${{ matrix.os == 'windows' }}
+
+    - run: dart pub get
+    - run: git clone https://gitee.com/lindeer/quickjs.git lib-src --depth 1 -b $(cat quickjs-version)
+    - run: mkdir assets
+
+    # ubuntu:18.04 is GLIBC_2.27 while ubuntu-22.04 host is GLIBC_2.29
+    - name: Build in Docker container
+      if: ${{ matrix.os == 'linux'}}
+      run: |
+        docker pull ubuntu:18.04
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          ubuntu:18.04 \
+          /bin/bash tool/compile.sh
+
+    - name: Build ${{ matrix.os }}-${{ matrix.arch }} host
+      working-directory: lib-src
+      if: ${{ matrix.os != 'linux'}}
+      run: |
+        make -j libquickjs.so
+
+    - name: Rename assets
+      if: ${{ matrix.os != 'windows'}}
+      env:
+        EXT: ${{ matrix.os == 'macos' && 'dylib' || (matrix.os == 'windows' && 'dll' || 'so') }}
+      run: |
+        mv lib-src/libquickjs.so assets/libquickjs-${{ matrix.os }}-${{ matrix.arch }}.${{ env.EXT }}
+        ls .
+
+    - name: Rename assets on windows
+      if: ${{ matrix.os == 'windows'}}
+      run: |
+        move "lib-src\libquickjs.so" "assets\quickjs-${{ matrix.os }}-${{ matrix.arch }}.dll"
+        ls .
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: quickjs-${{ matrix.os }}-${{ matrix.arch }}
+        path: |
+          assets/**
+        if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download assets
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: assets
+
+      - name: Display structure of downloaded assets
+        run: ls -R assets
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/quickjs-v')
+        with:
+          files: 'assets/**'
+          fail_on_unmatched_files: true
