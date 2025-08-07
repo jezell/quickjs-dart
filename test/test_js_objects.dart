@@ -109,7 +109,7 @@ void main() {
 
   test('test eval after bridge', () {
     const errorStr = """ReferenceError: 'x' is not defined
-    at <eval> (<test_obj>)
+    at <eval> (<test_obj>:1:1)
 """;
     engine.registerNotify('_onDataChanged', null);
 

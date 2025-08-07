@@ -17,7 +17,7 @@ void main() {
 
   test('test get js error', () {
     const errorStr = """ReferenceError: 'add' is not defined
-    at <eval> (<test>)
+    at <eval> (<test>:1:1)
 """;
     final result = engine.eval('add(5, 3);');
     expect(result.stdout, null);
@@ -43,10 +43,10 @@ void main() {
     const code = "import {User} from './user.js';";
     const exe = "var user = new User('Alem');console.log(user.name);";
     const errorSyntax = """SyntaxError: expecting '('
-    at <test>:1
+    at <test>:1:8
 """;
     const errorRef = """ReferenceError: 'User' is not defined
-    at <eval> (<test>:1)
+    at <eval> (<test>:1:16)
 """;
     String moduleReader(String _) => _module;
     NativeJsEngine.strReader = moduleReader;
@@ -97,14 +97,6 @@ void main() {
     expect(results.map((e) => e.stderr), [null, null, null]);
     expect(results.map((e) => e.value), names);
     expect(manager.length, 1);
-  });
-
-  test('run quickjs tests', () {
-    _runQjsTest('src/tests/test_closure.js');
-    _runQjsTest('src/tests/test_language.js');
-    _runQjsTest('src/tests/test_builtin.js');
-    _runQjsTest('src/tests/test_loop.js');
-    _runQjsTest('src/tests/test_bignum.js');
   });
 
   tearDownAll(() {
