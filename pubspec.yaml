@@ -1,6 +1,6 @@
 name: quickjs
 description: A dart binding of quickjs, a powerful js engine with native_assets_cli.
-version: 1.0.1
+version: 1.1.0-dev.1
 repository: https://github.com/lindeer/quickjs-dart
 
 topics:

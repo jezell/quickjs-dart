@@ -1,3 +1,9 @@
+## 1.1.0-dev.1
+
+- Upgrade hook 0.19.0
+- Download remote shared library
+- Gihub action for building assets
+
 ## 1.0.1
 
 - Upgrade native_assets_cli 0.8.0

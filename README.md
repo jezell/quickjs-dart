@@ -1,9 +1,15 @@
 
-A dart binding of [quickjs](https://bellard.org/quickjs/) with latest ffi tool native_assets_cli.
+A dart binding of [quickjs](https://bellard.org/quickjs/) with latest `native-assets`.
 
-Inspired by [flutter_js](https://pub.dev/packages/flutter_js), quickjs-dart is also used to run javascript code as a native citzen, but without flutter channels, and thanks to native_assets_cli, quickjs-dart could be integrated into any dart app (not flutter currently) with all platform support(except web). The integrated quickjs version is `2024-02-14`.
+Inspired by [flutter_js](https://pub.dev/packages/flutter_js), quickjs-dart is also used to run javascript code as a native citzen, but without flutter channels, and thanks to native_assets_cli, quickjs-dart could be integrated into any dart app (not flutter currently) with all platform support(except web). The integrated quickjs version is `2025-04-26`.
 
 Have a try with `dart --enable-experiment=native-assets run example/example.dart`
+
+## Note
+
+1. Currently, `native-assets` has moved to dart dev channel, so you would have to replace dart sdk with `3.10.0-14.0.dev`, which is working fine now.
+2. `quickjs` shared library was compiled in `ubuntu:18.04` container, it is compatible with `GLIBC_2.27`.
+3. `dart run --define=YOUR_ENV=env_value -DYOUR_ENV=env_value` seems not work with `3.10.0-14.0.dev`.
 
 ## asynchronous
 
