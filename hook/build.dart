@@ -31,7 +31,7 @@ Future<void> _builder(BuildInput input, BuildOutputBuilder output) async {
   output.assets.code.add(codeAsset);
 }
 
-const _url = 'http://127.0.0.1:8000';
+const _url = 'https://github.com/lindeer/quickjs-dart/releases/latest/download';
 
 Future<HttpClientResponse> _httpGet(HttpClient client, Uri uri) async {
   final request = await client.getUrl(uri);
